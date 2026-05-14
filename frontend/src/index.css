@@ -1,0 +1,70 @@
+/* src/index.css - solo estilos globales y variables */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --green-900: #1b2d22;
+  --green-800: #1e3a28;
+  --green-700: #2d5a3d;
+  --green-600: #3a7d52;
+  --green-500: #4a9e68;
+  --green-400: #6abf87;
+  --green-300: #95d5b2;
+  --green-200: #b7e4c7;
+  --green-100: #d8f3dc;
+  --green-50:  #f0faf3;
+
+  --text-primary: #1b2d22;
+  --text-secondary: #4a6152;
+  --text-muted: #7a9882;
+
+  --bg-base: #f4faf5;
+  --bg-card: #ffffff;
+  --bg-subtle: #edf7ef;
+
+  --border: #c8e6cf;
+  --border-hover: #6abf87;
+
+  --shadow-sm: 0 1px 3px rgba(27,45,34,0.08);
+  --shadow-md: 0 4px 16px rgba(27,45,34,0.10);
+  --shadow-lg: 0 8px 32px rgba(27,45,34,0.13);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 9999px;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--green-300);
+  border-radius: 3px;
+}
