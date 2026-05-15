@@ -31,6 +31,9 @@ public class Cart {
     @Column(nullable = false)
     private Double subtotalShipping;
 
+    @Column(nullable = false)
+    private Double total;
+
     @Column(name = "customer_id", nullable = false)
     private Long customerId;
 

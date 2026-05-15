@@ -1,4 +1,12 @@
 package com.ecofenix.carts.model.dto;
 
-public record CartResponseDTO() {
+import java.util.List;
+
+public record CartResponseDTO(
+        Double subtotalItems,
+        Double subtotalShipping,
+        Double total,
+        List<CartItemResponseDTO> cartItems,
+        Long customerId
+) {
 }

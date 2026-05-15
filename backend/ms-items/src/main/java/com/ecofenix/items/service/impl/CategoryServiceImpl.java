@@ -17,7 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    //Suporting methods
+    //Supporting methods
     private void validateUniqueName(String name, Long excludeId) {
         boolean exists;
         if (excludeId == null) {

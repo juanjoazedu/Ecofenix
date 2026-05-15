@@ -27,6 +27,9 @@ public class CartItem {
     private Double unitPrice;
 
     @Column(nullable = false)
+    private Double shippingCost;
+
+    @Column(nullable = false)
     private Double totalPrice;
 
     @Column(nullable = false)
