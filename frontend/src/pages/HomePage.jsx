@@ -11,7 +11,9 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,15 +40,41 @@ const HomePage = () => {
     fetchData();
   }, []);
 
+  // Cargar subcategorías cuando cambia la categoría principal
+  useEffect(() => {
+    if (selectedCategory) {
+      categoryService
+        .getSubCategories(Number(selectedCategory))
+        .then((subs) => {
+          setSubCategories(subs || []);
+        })
+        .catch(() => {
+          setSubCategories([]);
+        });
+    } else {
+      setSubCategories([]);
+      setSelectedSubCategory("");
+    }
+  }, [selectedCategory]);
+
+  // Resetear subcategoría cuando cambia la categoría principal
+  useEffect(() => {
+    setSelectedSubCategory("");
+  }, [selectedCategory]);
+
   useEffect(() => {
     const applyFilters = async () => {
       let result = [];
 
-      // Si hay categoría seleccionada, usar el endpoint específico
-      if (selectedCategory) {
+      const categoryIdsToFilter = selectedSubCategory 
+        ? [Number(selectedSubCategory)] 
+        : selectedCategory 
+          ? [Number(selectedCategory)] 
+          : [];
+
+      if (categoryIdsToFilter.length > 0) {
         try {
-          result = await itemService.getItemsByCategories([Number(selectedCategory)]);
-          // Filtrar solo activos
+          result = await itemService.getItemsByCategories(categoryIdsToFilter);
           result = result.filter(item => item.status === "ACTIVE");
         } catch (error) {
           console.error("Error filtrando por categoría:", error);
@@ -54,11 +82,9 @@ const HomePage = () => {
           return;
         }
       } else {
-        // Si no hay categoría, usar todos los items
         result = [...allItems];
       }
 
-      // Aplicar filtro de búsqueda
       if (searchTerm.trim() !== "") {
         const term = searchTerm.toLowerCase();
         result = result.filter(
@@ -68,7 +94,6 @@ const HomePage = () => {
         );
       }
 
-      // Aplicar filtro de tipo
       if (selectedType !== "") {
         result = result.filter((item) => item.type === selectedType);
       }
@@ -77,7 +102,16 @@ const HomePage = () => {
     };
 
     applyFilters();
-  }, [searchTerm, selectedType, selectedCategory, allItems]);
+  }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, allItems]);
+
+  // ✅ FUNCIÓN PARA LIMPIAR FILTROS - AGREGAR ESTO
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedType("");
+    setSelectedCategory("");
+    setSelectedSubCategory("");
+    setSubCategories([]);
+  };
 
   if (loading) {
     return <div className={styles.container}>Cargando artículos...</div>;
@@ -134,11 +168,35 @@ const HomePage = () => {
                 </option>
               ))}
             </select>
+
+            {subCategories.length > 0 && (
+              <select
+                className={styles.select}
+                value={selectedSubCategory}
+                onChange={(e) => setSelectedSubCategory(e.target.value)}
+              >
+                <option value="">Todas las subcategorías</option>
+                {subCategories.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
-          <p className={styles.resultsCount}>
-            {filteredItems.length} artículo(s) encontrado(s)
-          </p>
+          {/* ✅ BOTÓN PARA LIMPIAR FILTROS - AGREGAR AQUÍ */}
+          <div className={styles.filtersActions}>
+            <p className={styles.resultsCount}>
+              {filteredItems.length} artículo(s) encontrado(s)
+            </p>
+            <button 
+              onClick={clearFilters} 
+              className={styles.clearFiltersBtn}
+            >
+              Limpiar filtros
+            </button>
+          </div>
         </div>
 
         {/* GRID */}

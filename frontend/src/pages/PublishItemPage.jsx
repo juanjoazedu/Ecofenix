@@ -16,6 +16,7 @@ const PublishItemPage = () => {
     type: "FOR_SALE",
     status: "ACTIVE",
     categoryIds: [],
+    sellerId: Number(import.meta.env.VITE_DEFAULT_SELLER_ID) || 1  
   });
   const [mainCategories, setMainCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);

@@ -30,6 +30,33 @@ body {
   margin: 0 auto;
 }
 
+/* Contenedor para los filtros y el botón */
+.filtersActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botón para limpiar filtros */
+.clearFiltersBtn {
+  padding: 8px 16px;
+  background-color: var(--green-600);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.clearFiltersBtn:hover {
+  background-color: var(--green-700);
+  color: var(--green-200);
+}
+
 .itemsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
