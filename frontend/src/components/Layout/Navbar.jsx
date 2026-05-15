@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo-ecofenix.jpeg";
-import styles from "./Navbar.module.css";
+import styles from "../../styles/Navbar.module.css";
 
 const Navbar = () => {
   return (

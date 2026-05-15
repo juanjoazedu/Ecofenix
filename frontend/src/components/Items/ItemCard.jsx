@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styles from "./ItemCard.module.css";
+import styles from "../../styles/ItemCard.module.css";
 
 const ItemCard = ({ item }) => {
   const firstImage = item.images && item.images.length > 0 ? item.images[0].url : "https://picsum.photos/300/200";

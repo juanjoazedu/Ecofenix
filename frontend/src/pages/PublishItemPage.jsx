@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
-import styles from "./PublishItemPage.module.css";
+import styles from "../styles/PublishItemPage.module.css";
 
 const PublishItemPage = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const PublishItemPage = () => {
     type: "FOR_SALE",
     status: "ACTIVE",
     categoryIds: [],
-    sellerId: Number(import.meta.env.VITE_DEFAULT_SELLER_ID) || 1  
+    sellerId: Number(import.meta.env.VITE_DEFAULT_SELLER_ID) || 1
   });
   const [mainCategories, setMainCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -191,26 +191,50 @@ const PublishItemPage = () => {
           )}
         </div>
 
-        {/* Imágenes */}
+        {/* Imágenes - Sección mejorada */}
         <div className={styles.field}>
-          <label className={styles.label}>URLs de imágenes (externas)</label>
-          <div className={styles.addImageRow}>
-            <input
-              type="text"
-              value={imageInput}
-              onChange={(e) => setImageInput(e.target.value)}
-              placeholder="https://picsum.photos/500/500"
-              className={styles.addInput}
-            />
-            <button type="button" onClick={addImageUrl} className={styles.addBtn}>Agregar</button>
-          </div>
-          <div className={styles.imageGrid}>
-            {formData.imageUrls.map((url, idx) => (
-              <div key={idx} className={styles.imagePreview}>
-                <img src={url} alt="preview" />
-                <button type="button" onClick={() => removeImage(idx)} className={styles.removeBtn}>✕</button>
+          <label className={styles.label}>Imágenes del artículo (URLs externas)</label>
+          <div className={styles.imagesSection}>
+            <div className={styles.addImageRow}>
+              <input
+                type="text"
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImageUrl())}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                className={styles.addInput}
+              />
+              <button
+                type="button"
+                onClick={addImageUrl}
+                className={styles.addBtn}
+              >
+                <span>+</span> Agregar
+              </button>
+            </div>
+
+            {formData.imageUrls.length > 0 ? (
+              <div className={styles.imageGrid}>
+                {formData.imageUrls.map((url, idx) => (
+                  <div key={idx} className={styles.imagePreview}>
+                    <img src={url} alt={`Vista previa ${idx + 1}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className={styles.removeBtn}
+                      title="Eliminar imagen"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className={styles.emptyImages}>
+                <span className={styles.emptyImagesIcon}>📸</span>
+                <span>No hay imágenes agregadas aún</span>
+              </div>
+            )}
           </div>
         </div>
 

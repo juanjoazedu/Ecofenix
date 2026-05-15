@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
 import ItemCard from "../components/Items/ItemCard";
-import styles from "./HomePage.module.css";
+import styles from "../styles/HomePage.module.css"
 
 const HomePage = () => {
   const [allItems, setAllItems] = useState([]);
@@ -104,7 +104,7 @@ const HomePage = () => {
     applyFilters();
   }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, allItems]);
 
-  // ✅ FUNCIÓN PARA LIMPIAR FILTROS - AGREGAR ESTO
+  // FUNCIÓN PARA LIMPIAR FILTROS
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedType("");
@@ -185,7 +185,7 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* ✅ BOTÓN PARA LIMPIAR FILTROS - AGREGAR AQUÍ */}
+          {/* BOTÓN PARA LIMPIAR FILTROS */}
           <div className={styles.filtersActions}>
             <p className={styles.resultsCount}>
               {filteredItems.length} artículo(s) encontrado(s)
