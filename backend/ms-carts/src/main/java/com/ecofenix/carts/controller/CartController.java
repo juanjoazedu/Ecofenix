@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/carts")
 public class CartController {
-
     @Autowired
     private CartService cartService;
 
     @GetMapping("/test")
     public String test() {
-        return "Running the ms-items!!!";
+        return "Running the ms-carts!!!";
     }
 
     @PostMapping("/cart/items")

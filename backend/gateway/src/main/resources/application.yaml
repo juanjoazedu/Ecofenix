@@ -7,29 +7,33 @@ spring:
 
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:4200,http://localhost:3000, http://localhost:5173"
-            allowedMethods: "*"  # GET, POST, PUT, DELETE, etc.
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:4200"
+                  - "http://localhost:3000"
+                  - "http://localhost:5173"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
 
-      routes:
-        - id: ms-items
-          uri: lb://MS-ITEMS
-          predicates:
-            - Path=/api/items/**
-            - Path=/api/categories/**
-          filters:
-            - StripPrefix=1
-        - id: ms-carts
-          uri: lb://MS-CARTS
-          predicates:
-            - Path=/api/carts/**
-          filters:
-            - StripPrefix=1
+          routes:
+            - id: ms-items
+              uri: lb://MS-ITEMS
+              predicates:
+                - Path=/api/items/**,/api/categories/**
+              filters:
+                - StripPrefix=1
+            - id: ms-carts
+              uri: lb://MS-CARTS
+              predicates:
+                - Path=/api/carts/**
+              filters:
+                - StripPrefix=1
 
 eureka:
   client:
