@@ -21,5 +21,12 @@ export const API_CONFIG = {
       MAIN: "/categories/main",
       SUB: (parentId) => `/categories/sub/${parentId}`,
     },
+    CART: {
+      GET: (customerId) => `/carts/${customerId}`,
+      ADD_ITEM: "/carts/items",
+      UPDATE_ITEM: "/carts/items",
+      REMOVE_ITEM: (customerId, itemId) => `/carts/${customerId}/items/${itemId}`,
+      EMPTY: (customerId) => `/carts/${customerId}/empty`,
+    },
   },
 };
