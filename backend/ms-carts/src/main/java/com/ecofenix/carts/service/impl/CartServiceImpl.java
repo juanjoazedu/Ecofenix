@@ -35,6 +35,7 @@ public class CartServiceImpl implements CartService {
                     newCart.setCustomerId(customerId);
                     newCart.setSubtotalItems(0.0);
                     newCart.setSubtotalShipping(0.0);
+                    newCart.setTotal(0.0);
                     newCart.setItems(new ArrayList<>());
                     return cartRepository.save(newCart);
                 });
@@ -49,6 +50,7 @@ public class CartServiceImpl implements CartService {
                 .sum();
         cart.setSubtotalItems(subtotalItems);
         cart.setSubtotalShipping(subtotalShipping);
+        cart.setTotal(subtotalItems + subtotalShipping);
     }
 
     public CartResponseDTO convertToDTO(Cart cart) {
@@ -89,14 +91,20 @@ public class CartServiceImpl implements CartService {
         if (item == null) {
             throw new RuntimeException("Artículo no encontrado con la id: " + dto.itemId());
         }
-        if (item.stock() < dto.quantity()) {
-            throw new RuntimeException("Stock insuficiente");
-        }
 
         CartItem cartItem = cart.getItems().stream()
                 .filter(i -> i.getItemId().equals(dto.itemId()))
                 .findFirst()
                 .orElse(null);
+
+        int newTotalQuantity = dto.quantity();
+        if (cartItem != null) {
+            newTotalQuantity = cartItem.getQuantity() + dto.quantity();
+        }
+
+        if (item.stock() < newTotalQuantity) {
+            throw new RuntimeException("Stock insuficiente. Stock disponible: " + item.stock());
+        }
 
         if (cartItem == null) {
             cartItem = new CartItem();
@@ -105,10 +113,10 @@ public class CartServiceImpl implements CartService {
             cart.getItems().add(cartItem);
         }
 
-        cartItem.setQuantity(dto.quantity());
+        cartItem.setQuantity(newTotalQuantity);
         cartItem.setUnitPrice(item.price());
         cartItem.setShippingCost(item.shippingCost());
-        cartItem.setTotalPrice(item.price() * dto.quantity());
+        cartItem.setTotalPrice(item.price() * newTotalQuantity);
 
         recalculateCartTotals(cart);
         cartRepository.save(cart);
@@ -171,8 +179,7 @@ public class CartServiceImpl implements CartService {
     public void emptyCart(Long customerId) {
         Cart cart = getOrCreateCart(customerId);
         cart.getItems().clear();
-        cart.setSubtotalItems(0.0);
-        cart.setSubtotalShipping(0.0);
+        recalculateCartTotals(cart);
         cartRepository.save(cart);
     }
 }
