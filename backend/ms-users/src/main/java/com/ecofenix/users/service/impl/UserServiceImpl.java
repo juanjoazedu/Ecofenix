@@ -79,9 +79,16 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userRequest.username());
         user.setPassword(passwordEncoder.encode(userRequest.password()));
 
-        Role defaultRole = roleRepository.findByTitle("USER")
-                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol predeterminado USER"));
-        user.setRoles(Collections.singletonList(defaultRole));
+        if (userRequest.roleIds() == null || userRequest.roleIds().isEmpty()) {
+            throw new RuntimeException("Debe asignar al menos un rol al usuario");
+        }
+
+        List<Role> roles = userRequest.roleIds().stream()
+                .map(roleId -> roleRepository.findById(roleId)
+                        .orElseThrow(() -> new RuntimeException("Rol no encontrado con id: " + roleId)))
+                .collect(Collectors.toList());
+
+        user.setRoles(roles);
 
         if (userRequest.addresses() != null) {
             List<Addresses> addresses = userRequest.addresses().stream()

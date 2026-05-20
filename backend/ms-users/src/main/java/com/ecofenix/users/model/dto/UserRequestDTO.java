@@ -2,6 +2,7 @@ package com.ecofenix.users.model.dto;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record UserRequestDTO(
         @NotBlank String name,
@@ -11,5 +12,6 @@ public record UserRequestDTO(
         @Email @NotBlank String email,
         @NotBlank String username,
         @NotBlank String password,
-        java.util.List<AddressDTO> addresses
+        List<AddressDTO> addresses,
+        @NotNull @Size(min = 1) List<Long> roleIds
 ) {}

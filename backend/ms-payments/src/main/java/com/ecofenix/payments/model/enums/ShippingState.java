@@ -1,4 +1,4 @@
-package com.ecofenix.transactions.model.enums;
+package com.ecofenix.payments.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ShippingState {
-    PROCESSING("Procesando"),
     PENDING("Pendiente"),
+    PROCESSING("Procesando"),
     SHIPPED("Enviado"),
     DELIVERED("Entregado"),
     CANCELLED("Cancelado");

@@ -34,6 +34,18 @@ spring:
                 - Path=/api/carts/**
               filters:
                 - StripPrefix=1
+            - id: ms-transactions
+              uri: lb://MS-TRANSACTIONS
+              predicates:
+                - Path=/api/transactions/**
+              filters:
+                - StripPrefix=1
+            - id: ms-payments
+              uri: lb://MS-PAYMENTS
+              predicates:
+                - Path=/api/payments/**
+              filters:
+                - StripPrefix=1
             - id: ms-users
               uri: lb://MS-USERS
               predicates:

@@ -30,6 +30,9 @@ public class Payment {
     @Column(nullable = false)
     private Long orderId;
 
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Invoice invoice;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

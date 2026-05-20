@@ -5,7 +5,7 @@ spring:
   application:
     name: ms-payments
   datasource:
-    url: JDBC:mysql://localhost:3306/ecofenix_payments?createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/ecofenix_payments?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: ecofenix_temp
     password: 1234567890
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,6 +13,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 5000
+            read-timeout: 5000
 
 eureka:
   client:

@@ -20,9 +20,6 @@ spring:
           default:
             connect-timeout: 5000
             read-timeout: 5000
-#          MS-ITEMS:
-#            connect-timeout: 3000
-#            read-timeout: 3000
 
 eureka:
   client:
