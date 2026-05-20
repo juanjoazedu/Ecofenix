@@ -11,6 +11,6 @@ public record UserResponseDTO(
         String image,
         String email,
         String username,
-        List<String> roles,
-        List<String> addresses
+        List<RoleDTO> roles,
+        List<AddressDTO> addresses
 ) {}

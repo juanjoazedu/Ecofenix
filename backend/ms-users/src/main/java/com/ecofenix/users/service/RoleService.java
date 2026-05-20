@@ -1,12 +1,13 @@
 package com.ecofenix.users.service;
 
-import com.ecofenix.users.model.entity.Role;
+import com.ecofenix.users.model.dto.RoleDTO;
+
 import java.util.List;
 
 public interface RoleService {
-    Role create(Role role);
-    Role update(Long id, Role role);
+    List<RoleDTO> findAll();
+    RoleDTO findById(Long id);
+    RoleDTO create(RoleDTO dto);
+    RoleDTO update(Long id, RoleDTO dto);
     void delete(Long id);
-    Role findById(Long id);
-    List<Role> findAll();
 }

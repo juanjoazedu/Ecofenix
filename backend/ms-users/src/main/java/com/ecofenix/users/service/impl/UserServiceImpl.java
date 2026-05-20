@@ -1,22 +1,28 @@
 package com.ecofenix.users.service.impl;
 
+import com.ecofenix.users.model.dto.AddressDTO;
+import com.ecofenix.users.model.dto.RoleDTO;
 import com.ecofenix.users.model.dto.UserRequestDTO;
 import com.ecofenix.users.model.dto.UserResponseDTO;
 import com.ecofenix.users.model.entity.Addresses;
 import com.ecofenix.users.model.entity.Role;
 import com.ecofenix.users.model.entity.User;
+import com.ecofenix.users.repository.AddressRepository;
 import com.ecofenix.users.repository.RoleRepository;
 import com.ecofenix.users.repository.UserRepository;
 import com.ecofenix.users.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -26,35 +32,19 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AddressRepository addressRepository;
 
-    // Conversion methods
+    private final PasswordEncoder passwordEncoder;
 
-    private User convertToEntity(UserRequestDTO dto) {
-        User user = new User();
-        user.setName(dto.name());
-        user.setLastName(dto.lastName());
-        user.setDateOfBirth(dto.dateOfBirth());
-        user.setImage(dto.image());
-        user.setEmail(dto.email());
-        user.setUsername(dto.username());
-        user.setPassword(passwordEncoder.encode(dto.password()));
-
-        if (dto.roleIds() != null && !dto.roleIds().isEmpty()) {
-            List<Role> roles = validateAndGetRoles(dto.roleIds());
-            user.setRoles(roles);
-        }
-        return user;
-    }
-
+    //Conversion methods
     private UserResponseDTO convertToDTO(User user) {
-        List<String> roleTitles = user.getRoles().stream()
-                .map(Role::getTitle)
-                .toList();
+        List<RoleDTO> roleDTOs = user.getRoles().stream()
+                .map(role -> new RoleDTO(role.getId(), role.getTitle()))
+                .collect(Collectors.toList());
 
-        List<String> addressStrings = user.getAddresses().stream()
-                .map(Addresses::getAddress)
-                .toList();
+        List<AddressDTO> addressDTOs = user.getAddresses().stream()
+                .map(addr -> new AddressDTO(addr.getId(), addr.getAddress()))
+                .collect(Collectors.toList());
 
         return new UserResponseDTO(
                 user.getId(),
@@ -64,136 +54,88 @@ public class UserServiceImpl implements UserService {
                 user.getImage(),
                 user.getEmail(),
                 user.getUsername(),
-                roleTitles,
-                addressStrings
+                roleDTOs,
+                addressDTOs
         );
     }
 
-    private List<Addresses> createAddressesFromStrings(User user, List<String> addressStrings) {
-        if (addressStrings == null || addressStrings.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<Addresses> addresses = new ArrayList<>();
-        for (String addrText : addressStrings) {
-            Addresses address = new Addresses();
-            address.setAddress(addrText);
-            address.setUser(user);
-            addresses.add(address);
-        }
-        return addresses;
-    }
-
-    // Validation methods
-
-    private List<Role> validateAndGetRoles(List<Long> roleIds) {
-        if (roleIds == null || roleIds.isEmpty()) {
-            throw new RuntimeException("Debe seleccionar al menos un rol");
-        }
-        List<Role> roles = roleRepository.findAllById(roleIds);
-        if (roles.size() != roleIds.size()) {
-            List<Long> foundIds = roles.stream().map(Role::getId).toList();
-            List<Long> missingIds = roleIds.stream()
-                    .filter(id -> !foundIds.contains(id))
-                    .toList();
-            throw new RuntimeException("Roles no encontrados con IDs: " + missingIds);
-        }
-        return roles;
-    }
-
-    private void validateEmailUniqueness(String email, Long excludeUserId) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            if (excludeUserId == null || !user.getId().equals(excludeUserId)) {
-                throw new RuntimeException("El email ya está registrado: " + email);
-            }
-        });
-    }
-
-    private void validateUsernameUniqueness(String username, Long excludeUserId) {
-        userRepository.findByUsername(username).ifPresent(user -> {
-            if (excludeUserId == null || !user.getId().equals(excludeUserId)) {
-                throw new RuntimeException("El nombre de usuario ya está registrado: " + username);
-            }
-        });
-    }
-
-    // CRUD methods
-
+    //CRUD methods
     @Override
     @Transactional
-    public UserResponseDTO create(UserRequestDTO dto) {
-        if (dto.email() == null || dto.email().isBlank())
-            throw new RuntimeException("El email es obligatorio");
-        if (dto.username() == null || dto.username().isBlank())
-            throw new RuntimeException("El nombre de usuario es obligatorio");
-        if (dto.password() == null || dto.password().length() < 6)
-            throw new RuntimeException("La contraseña debe tener al menos 6 caracteres");
+    public UserResponseDTO register(UserRequestDTO userRequest) {
+        if (userRepository.existsByUsername(userRequest.username())) {
+            throw new RuntimeException("Este nombre de usuario ya existe");
+        }
+        if (userRepository.existsByEmail(userRequest.email())) {
+            throw new RuntimeException("Este email ya existe");
+        }
 
-        validateEmailUniqueness(dto.email(), null);
-        validateUsernameUniqueness(dto.username(), null);
+        User user = new User();
+        user.setName(userRequest.name());
+        user.setLastName(userRequest.lastName());
+        user.setDateOfBirth(userRequest.dateOfBirth());
+        user.setImage(userRequest.image());
+        user.setEmail(userRequest.email());
+        user.setUsername(userRequest.username());
+        user.setPassword(passwordEncoder.encode(userRequest.password()));
 
-        User user = convertToEntity(dto);
-        List<Addresses> addresses = createAddressesFromStrings(user, dto.addresses());
-        user.setAddresses(addresses);
+        Role defaultRole = roleRepository.findByTitle("USER")
+                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol predeterminado USER"));
+        user.setRoles(Collections.singletonList(defaultRole));
+
+        if (userRequest.addresses() != null) {
+            List<Addresses> addresses = userRequest.addresses().stream()
+                    .map(addr -> {
+                        Addresses a = new Addresses();
+                        a.setAddress(addr.address());
+                        a.setUser(user);
+                        return a;
+                    }).collect(Collectors.toList());
+            user.setAddresses(addresses);
+        }
 
         User saved = userRepository.save(user);
         return convertToDTO(saved);
     }
 
     @Override
-    public List<UserResponseDTO> findAll() {
-        return userRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .toList();
-    }
-
-    @Override
     public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return convertToDTO(user);
     }
 
     @Override
-    public List<UserResponseDTO> findByRole(Long roleId) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + roleId));
-        return userRepository.findByRolesContaining(role).stream()
+    public UserResponseDTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return convertToDTO(user);
+    }
+
+    @Override
+    public List<UserResponseDTO> findAll() {
+        return userRepository.findAll().stream()
                 .map(this::convertToDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public UserResponseDTO update(Long id, UserRequestDTO dto) {
-        User existing = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    public UserResponseDTO update(Long id, UserRequestDTO userRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        validateEmailUniqueness(dto.email(), id);
-        validateUsernameUniqueness(dto.username(), id);
-
-        existing.setName(dto.name());
-        existing.setLastName(dto.lastName());
-        existing.setDateOfBirth(dto.dateOfBirth());
-        existing.setImage(dto.image());
-        existing.setEmail(dto.email());
-        existing.setUsername(dto.username());
-        if (dto.password() != null && !dto.password().isBlank()) {
-            existing.setPassword(passwordEncoder.encode(dto.password()));
+        user.setName(userRequest.name());
+        user.setLastName(userRequest.lastName());
+        user.setDateOfBirth(userRequest.dateOfBirth());
+        user.setImage(userRequest.image());
+        user.setEmail(userRequest.email());
+        user.setUsername(userRequest.username());
+        if (userRequest.password() != null && !userRequest.password().isBlank()) {
+            user.setPassword(passwordEncoder.encode(userRequest.password()));
         }
 
-        if (dto.roleIds() != null) {
-            List<Role> roles = validateAndGetRoles(dto.roleIds());
-            existing.getRoles().clear();
-            existing.getRoles().addAll(roles);
-        }
-
-        if (dto.addresses() != null) {
-            existing.getAddresses().clear();
-            List<Addresses> newAddresses = createAddressesFromStrings(existing, dto.addresses());
-            existing.getAddresses().addAll(newAddresses);
-        }
-
-        User updated = userRepository.save(existing);
+        User updated = userRepository.save(user);
         return convertToDTO(updated);
     }
 
@@ -201,39 +143,76 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         userRepository.delete(user);
     }
 
     @Override
     @Transactional
-    public UserResponseDTO assignRole(Long userId, Long roleId) {
+    public UserResponseDTO assignRole(Long userId, String roleTitle) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + roleId));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Role role = roleRepository.findByTitle(roleTitle)
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
         if (!user.getRoles().contains(role)) {
             user.getRoles().add(role);
-            if (!role.getUsers().contains(user)) {
-                role.getUsers().add(user);
-            }
         }
-        User saved = userRepository.save(user);
-        return convertToDTO(saved);
+        User updated = userRepository.save(user);
+        return convertToDTO(updated);
     }
 
     @Override
     @Transactional
-    public UserResponseDTO removeRole(Long userId, Long roleId) {
+    public UserResponseDTO replaceAddresses(Long userId, List<AddressDTO> addressDTOs) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + userId));
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + roleId));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        user.getRoles().remove(role);
-        role.getUsers().remove(user);
-        User saved = userRepository.save(user);
-        return convertToDTO(saved);
+        user.getAddresses().clear();
+
+        List<Addresses> newAddresses = addressDTOs.stream()
+                .map(dto -> {
+                    Addresses addr = new Addresses();
+                    addr.setAddress(dto.address());
+                    addr.setUser(user);
+                    return addr;
+                })
+                .toList();
+        user.getAddresses().addAll(newAddresses);
+
+        User updated = userRepository.save(user);
+        return convertToDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO addAddress(Long userId, AddressDTO addressDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Addresses address = new Addresses();
+        address.setAddress(addressDTO.address());
+        address.setUser(user);
+        user.getAddresses().add(address);
+        User updated = userRepository.save(user);
+        return convertToDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateAddress(Long addressId, AddressDTO addressDTO) {
+        Addresses address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
+        address.setAddress(addressDTO.address());
+        addressRepository.save(address);
+        return convertToDTO(address.getUser());
+    }
+
+    @Override
+    @Transactional
+    public void deleteAddress(Long addressId) {
+        Addresses address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
+        addressRepository.delete(address);
     }
 }
