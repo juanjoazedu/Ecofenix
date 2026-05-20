@@ -34,6 +34,12 @@ spring:
                 - Path=/api/carts/**
               filters:
                 - StripPrefix=1
+            - id: ms-users
+              uri: lb://MS-USERS
+              predicates:
+                - Path=/api/users/**,/api/roles/**
+              filters:
+                - StripPrefix=1
 
 eureka:
   client:
