@@ -1,0 +1,318 @@
+/*src/styles/CheckoutPage.css*/
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--green-900);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Steps indicator */
+.stepsIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 2.5rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.4;
+  transition: var(--transition);
+}
+
+.step.activeStep {
+  opacity: 1;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.activeStep .stepNumber {
+  background: var(--green-500);
+  color: white;
+}
+
+.stepLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.stepDivider {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+}
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--green-900);
+}
+
+/* Items */
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.itemTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.itemBadge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.itemPrice {
+  font-weight: 600;
+  color: var(--green-700);
+}
+
+/* Summary */
+.summaryBox {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 0.8rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.totalAmount {
+  color: var(--green-800);
+  font-size: 1.3rem;
+}
+
+.totalReminder {
+  text-align: right;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* Buttons */
+.primaryBtn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: var(--green-600);
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.primaryBtn:hover {
+  background: var(--green-700);
+  transform: translateY(-1px);
+}
+
+.secondaryBtn {
+  padding: 0.85rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.secondaryBtn:hover {
+  background: var(--bg-subtle);
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.formActions .primaryBtn {
+  flex: 2;
+}
+
+.formActions .secondaryBtn {
+  flex: 1;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input {
+  font-family: var(--font-body);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px rgba(106, 191, 135, 0.15);
+}
+
+/* Success */
+.successContent {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: var(--green-300);
+  color: var(--green-900);
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+}
+
+.successTitle {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--green-900);
+  margin-bottom: 0.8rem;
+}
+
+.successText {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.successContent .primaryBtn {
+  max-width: 250px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  .formActions {
+    flex-direction: column;
+  }
+  .stepsIndicator {
+    flex-wrap: wrap;
+  }
+  .stepLabel {
+    display: none;
+  }
+}

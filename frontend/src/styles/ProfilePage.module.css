@@ -1,0 +1,325 @@
+/*src/styles/ProfilePage.module.css*/
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--green-900);
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.tab {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.activeTab {
+  color: var(--green-700);
+  background: var(--bg-subtle);
+  border-bottom: 2px solid var(--green-600);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.tabContent {
+  min-height: 400px;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+/* Perfil vista normal */
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.avatarWrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--green-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  font-family: var(--font-body);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--green-800);
+}
+
+.userName {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.editBtn {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: var(--green-600);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+
+.editBtn:hover {
+  background: var(--green-700);
+}
+
+/* Formulario edición */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input,
+.fileInput {
+  font-family: var(--font-body);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px rgba(106, 191, 135, 0.15);
+}
+
+.fileInput {
+  padding: 0.5rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.saveBtn {
+  padding: 0.75rem 2rem;
+  background: var(--green-600);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.saveBtn:hover {
+  background: var(--green-700);
+}
+
+.cancelBtn {
+  padding: 0.75rem 2rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cancelBtn:hover {
+  background: var(--bg-subtle);
+}
+
+/* Artículos */
+.itemsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.itemCardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.itemActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  font-weight: 500;
+}
+
+.actionBtn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-hover);
+}
+
+.deleteBtn {
+  color: #c53030;
+  border-color: #fed7d7;
+}
+.deleteBtn:hover {
+  background: #fff5f5;
+  border-color: #c53030;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.publishLink {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--green-600);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.publishLink:hover {
+  border-bottom-color: var(--green-600);
+}
+
+.loadingText {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Seguridad */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--green-900);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+  .infoGrid,
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .tab {
+    text-align: left;
+  }
+  .avatarSection {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .itemsGrid {
+    grid-template-columns: 1fr;
+  }
+}

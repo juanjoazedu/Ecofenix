@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+// src/pages/PublishItemPage.jsx
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
+import { uploadFiles } from "../services/cloudinaryService";
 import styles from "../styles/PublishItemPage.module.css";
 
 const PublishItemPage = () => {
@@ -22,27 +24,34 @@ const PublishItemPage = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [selectedMainCat, setSelectedMainCat] = useState("");
   const [selectedSubCat, setSelectedSubCat] = useState("");
-  const [imageInput, setImageInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const fileInputRef = useRef(null);
+
+  // Liberar URLs al desmontar
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   // Cargar categorías principales
   useEffect(() => {
     categoryService.getMainCategories().then(setMainCategories);
   }, []);
 
-  // Cuando cambia la categoría principal, cargar subcategorías
+  // Subcategorías al cambiar categoría principal
   useEffect(() => {
     if (selectedMainCat) {
       categoryService
         .getSubCategories(selectedMainCat)
         .then((subs) => {
           setSubCategories(subs);
-          // Si no hay subcategorías, asignar la categoría principal inmediatamente
           if (!subs || subs.length === 0) {
             setFormData((prev) => ({ ...prev, categoryIds: [Number(selectedMainCat)] }));
             setSelectedSubCat("");
           } else {
-            // Si hay subcategorías, limpiar selección anterior y categoryIds
             setFormData((prev) => ({ ...prev, categoryIds: [] }));
             setSelectedSubCat("");
           }
@@ -64,31 +73,45 @@ const PublishItemPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addImageUrl = () => {
-    if (imageInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        imageUrls: [...prev.imageUrls, imageInput.trim()],
-      }));
-      setImageInput("");
+  // Seleccionar archivos (acumula hasta 5)
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const totalFiles = selectedFiles.length + files.length;
+    if (totalFiles > 5) {
+      alert(`Máximo 5 imágenes. Ya tienes ${selectedFiles.length} seleccionada(s).`);
+      return;
     }
+    const newFiles = [...selectedFiles, ...files];
+    setSelectedFiles(newFiles);
+    // Regenerar todas las previsualizaciones (para mantener orden)
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(newPreviews);
+    // Limpiar input para poder seguir agregando
+    e.target.value = '';
+  };
+
+  const handleUploadButtonClick = () => {
+    fileInputRef.current.click();
   };
 
   const removeImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
-    }));
+    const newFiles = [...selectedFiles];
+    const newPreviews = [...previewUrls];
+    URL.revokeObjectURL(newPreviews[index]);
+    newFiles.splice(index, 1);
+    newPreviews.splice(index, 1);
+    setSelectedFiles(newFiles);
+    setPreviewUrls(newPreviews);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.imageUrls.length === 0) {
-      alert("Agrega al menos una URL de imagen");
+    if (selectedFiles.length === 0) {
+      alert("Selecciona al menos una imagen para el artículo");
       return;
     }
     if (formData.categoryIds.length === 0) {
-      // Mensaje más específico
       if (subCategories.length > 0 && !selectedSubCat) {
         alert("Debes seleccionar una subcategoría para esta categoría principal.");
       } else {
@@ -98,7 +121,10 @@ const PublishItemPage = () => {
     }
     setLoading(true);
     try {
-      await itemService.createItem(formData);
+      const uploadedUrls = await uploadFiles(selectedFiles, "ecofenix/products");
+      if (uploadedUrls.length === 0) throw new Error("No se pudo subir ninguna imagen");
+      const finalItemData = { ...formData, imageUrls: uploadedUrls };
+      await itemService.createItem(finalItemData);
       alert("Artículo publicado con éxito");
       navigate("/");
     } catch (error) {
@@ -111,7 +137,6 @@ const PublishItemPage = () => {
 
   const handleMainCatChange = (catId) => {
     setSelectedMainCat(catId);
-    // No se asigna categoryIds aquí, lo hará el useEffect
   };
 
   const handleSubCatChange = (subId) => {
@@ -179,62 +204,60 @@ const PublishItemPage = () => {
                   <option key={sub.id} value={sub.id}>{sub.name}</option>
                 ))}
               </select>
-              <p className={styles.hint} style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "4px" }}>
-                * Esta categoría tiene subcategorías, debes elegir una.
-              </p>
+              <p className={styles.hint}>* Esta categoría tiene subcategorías, debes elegir una.</p>
             </>
           )}
           {subCategories.length === 0 && selectedMainCat && (
-            <p className={styles.hint} style={{ fontSize: "0.7rem", color: "var(--green-700)", marginTop: "4px" }}>
-              ✓ Categoría seleccionada correctamente.
-            </p>
+            <p className={styles.hint}>✓ Categoría seleccionada correctamente.</p>
           )}
         </div>
 
-        {/* Imágenes - Sección mejorada */}
+        {/* Imágenes: fila horizontal con scroll, imágenes pequeñas */}
         <div className={styles.field}>
-          <label className={styles.label}>Imágenes del artículo (URLs externas)</label>
+          <label className={styles.label}>Imágenes del artículo *</label>
           <div className={styles.imagesSection}>
-            <div className={styles.addImageRow}>
-              <input
-                type="text"
-                value={imageInput}
-                onChange={(e) => setImageInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImageUrl())}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className={styles.addInput}
-              />
-              <button
-                type="button"
-                onClick={addImageUrl}
-                className={styles.addBtn}
-              >
-                <span>+</span> Agregar
-              </button>
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+            <button
+              type="button"
+              onClick={handleUploadButtonClick}
+              className={styles.uploadBtn}
+              disabled={loading}
+            >
+              📸 Subir imágenes desde dispositivo
+            </button>
 
-            {formData.imageUrls.length > 0 ? (
-              <div className={styles.imageGrid}>
-                {formData.imageUrls.map((url, idx) => (
-                  <div key={idx} className={styles.imagePreview}>
-                    <img src={url} alt={`Vista previa ${idx + 1}`} />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className={styles.removeBtn}
-                      title="Eliminar imagen"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+            {previewUrls.length > 0 ? (
+              <div className={styles.imageScrollContainer}>
+                <div className={styles.imageRow}>
+                  {previewUrls.map((url, idx) => (
+                    <div key={idx} className={styles.imagePreview}>
+                      <img src={url} alt={`Vista previa ${idx + 1}`} />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className={styles.removeBtn}
+                        title="Eliminar imagen"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className={styles.emptyImages}>
                 <span className={styles.emptyImagesIcon}>📸</span>
-                <span>No hay imágenes agregadas aún</span>
+                <span>No hay imágenes. Presiona el botón para seleccionar.</span>
               </div>
             )}
+            <p className={styles.hint}>Puedes subir hasta 5 imágenes (JPG, PNG, WebP).</p>
           </div>
         </div>
 

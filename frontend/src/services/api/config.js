@@ -5,6 +5,22 @@ export const API_CONFIG = {
     "Content-Type": "application/json",
   },
   ENDPOINTS: {
+    AUTH: {
+      LOGIN: "/auth/login",
+    },
+    ROLES: {
+      GET_ALL: "/roles",
+      GET_BY_ID: (id) => `/roles/${id}`,
+    },
+    USERS: {
+      REGISTER: "/users/register",
+      GET_ALL: "/users",
+      GET_BY_ID: (id) => `/users/${id}`,
+      UPDATE: (id) => `/users/${id}`,
+      DELETE: (id) => `/users/${id}`,
+      ASSIGN_ROLE: (userId, roleTitle) => `/users/${userId}/roles/${roleTitle}`,
+      REPLACE_ADDRESSES: (userId) => `/users/${userId}/addresses`,
+    },
     ITEMS: {
       GET_ALL: "/items",
       GET_BY_ID: (id) => `/items/${id}`,
