@@ -12,7 +12,6 @@ const Navbar = () => {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    // Solo si hay sesión y tenemos el id del usuario
     if (!isAuthenticated || !user?.id) {
       setCartCount(0);
       return;
@@ -31,10 +30,15 @@ const Navbar = () => {
 
     fetchCartCount();
 
-    // Actualiza el contador al volver a la pestaña
     const onFocus = () => fetchCartCount();
+    const onCartUpdate = () => fetchCartCount(); // nuevo callback
+
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    window.addEventListener("cart-updated", onCartUpdate); // nuevo listener
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("cart-updated", onCartUpdate);
+    };
   }, [isAuthenticated, user?.id]);
 
   const handleLogout = () => {

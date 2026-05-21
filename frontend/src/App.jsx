@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Layout from "./components/Layout/Layout";
+
 import HomePage from "./pages/HomePage";
 import ItemDetailPage from "./pages/ItemDetailPage";
 import PublishItemPage from "./pages/PublishItemPage";
@@ -19,16 +23,59 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
+              
+              {/* Públicas */}
               <Route index element={<HomePage />} />
               <Route path="/catalogo" element={<HomePage />} />
               <Route path="/items/:id" element={<ItemDetailPage />} />
-              <Route path="/publicar" element={<PublishItemPage />} />
               <Route path="/nosotros" element={<AboutPage />} />
-              <Route path="/carrito" element={<CartPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
-              <Route path="/perfil" element={<ProfilePage />} />
-              <Route path="/articulos/editar/:id" element={<EditItemPage />} />
-              <Route path="/pago" element={<CheckoutPage />} />
+
+              {/* Protegidas */}
+              <Route
+                path="/publicar"
+                element={
+                  <ProtectedRoute>
+                    <PublishItemPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/carrito"
+                element={
+                  <ProtectedRoute>
+                    <CartPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/perfil"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/articulos/editar/:id"
+                element={
+                  <ProtectedRoute>
+                    <EditItemPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/pago"
+                element={
+                  <ProtectedRoute>
+                    <CheckoutPage />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
           </Routes>
         </BrowserRouter>

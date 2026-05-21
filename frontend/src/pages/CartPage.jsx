@@ -15,36 +15,29 @@ export default function CartPage() {
 
   const [actionLoading, setActionLoading] = useState(null); // id del ítem en proceso
 
-  // const handleQuantityChange = async (itemId, newQuantity) => {
-  //   if (newQuantity < 1) return;
-  //   setActionLoading(itemId);
-  //   await updateItemQuantity(itemId, newQuantity);
-  //   setActionLoading(null);
-  // };
-
   const handleQuantityChange = async (itemId, newQuantity, oldQuantity) => {
     if (newQuantity < 1) return;
     setActionLoading(itemId);
     const success = await updateItemQuantity(itemId, newQuantity);
     setActionLoading(null);
     if (!success) {
-      // Restaurar la cantidad anterior si falla
-      // (el contexto ya no actualizó el carrito, pero el estado local sigue con oldQuantity)
-      // No es necesario forzar nada porque el carrito no se recargó.
-      // Mostrar mensaje solo si quieres
       alert("No se pudo actualizar la cantidad. Verifica el stock disponible.");
+      return; // No disparar evento si falló
     }
+    window.dispatchEvent(new CustomEvent('cart-updated')); // Avisa al Navbar
   };
 
   const handleRemove = async (itemId) => {
     setActionLoading(itemId);
     await removeItem(itemId);
     setActionLoading(null);
+    window.dispatchEvent(new CustomEvent('cart-updated')); // Después de eliminar
   };
 
   const handleEmptyCart = async () => {
     if (window.confirm("¿Vaciar todo el carrito?")) {
       await emptyCart();
+      window.dispatchEvent(new CustomEvent('cart-updated')); // Después de vaciar
     }
   };
 
@@ -105,9 +98,9 @@ export default function CartPage() {
           Total: <span>${cart.total.toFixed(2)}</span>
         </p>
 
-        <button 
-        className={styles.checkoutBtn}
-        onClick={handleEmptyCart} className={styles.emptyBtn}>
+        <button
+          className={styles.checkoutBtn}
+          onClick={handleEmptyCart} className={styles.emptyBtn}>
           Vaciar carrito
         </button>
 
