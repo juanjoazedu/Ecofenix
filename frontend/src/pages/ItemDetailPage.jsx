@@ -6,7 +6,7 @@ import styles from "../styles/ItemDetailPage.module.css";
 
 const ItemDetailPage = () => {
   const { id } = useParams();
-  const { addItem, cart } = useCart(); // carrito global
+  const { addItem, cart } = useCart();
   const navigate = useNavigate();
 
   const [item, setItem] = useState(null);

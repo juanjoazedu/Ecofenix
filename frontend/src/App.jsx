@@ -9,6 +9,7 @@ import AboutPage from "./pages/AboutPage";
 import CartPage from "./pages/CartPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import EditItemPage from "./pages/EditItemPage";
 import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
@@ -20,12 +21,13 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="/catalogo" element={<HomePage />} />
-              <Route path="/item/:id" element={<ItemDetailPage />} />
+              <Route path="/items/:id" element={<ItemDetailPage />} />
               <Route path="/publicar" element={<PublishItemPage />} />
               <Route path="/nosotros" element={<AboutPage />} />
               <Route path="/carrito" element={<CartPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
               <Route path="/perfil" element={<ProfilePage />} />
+              <Route path="/articulos/editar/:id" element={<EditItemPage />} />
               <Route path="/pago" element={<CheckoutPage />} />
             </Route>
           </Routes>

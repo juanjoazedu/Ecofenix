@@ -1,10 +1,14 @@
+// src/pages/HomePage.jsx
 import { useEffect, useState } from "react";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
+import { useAuth } from "../context/AuthContext"; // ← nuevo
 import ItemCard from "../components/Items/ItemCard";
-import styles from "../styles/HomePage.module.css"
+import styles from "../styles/HomePage.module.css";
 
 const HomePage = () => {
+  const { user } = useAuth(); // ← obtener usuario logueado
+
   const [allItems, setAllItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,9 +27,17 @@ const HomePage = () => {
           categoryService.getMainCategories(),
         ]);
 
-        const activeItems = itemsData.filter(
+        // 1. Solo artículos activos
+        let activeItems = itemsData.filter(
           (item) => item.status === "ACTIVE"
         );
+
+        // 2. Excluir los artículos del usuario actual
+        if (user?.id) {
+          activeItems = activeItems.filter(
+            (item) => item.sellerId !== user.id
+          );
+        }
 
         setAllItems(activeItems);
         setFilteredItems(activeItems);
@@ -38,7 +50,7 @@ const HomePage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user?.id]); // ← se vuelve a ejecutar si cambia el usuario (al iniciar sesión)
 
   // Cargar subcategorías cuando cambia la categoría principal
   useEffect(() => {
@@ -66,23 +78,27 @@ const HomePage = () => {
     const applyFilters = async () => {
       let result = [];
 
-      const categoryIdsToFilter = selectedSubCategory 
-        ? [Number(selectedSubCategory)] 
-        : selectedCategory 
-          ? [Number(selectedCategory)] 
+      const categoryIdsToFilter = selectedSubCategory
+        ? [Number(selectedSubCategory)]
+        : selectedCategory
+          ? [Number(selectedCategory)]
           : [];
 
       if (categoryIdsToFilter.length > 0) {
         try {
           result = await itemService.getItemsByCategories(categoryIdsToFilter);
           result = result.filter(item => item.status === "ACTIVE");
+          // También excluir propios si es que el backend no lo hace
+          if (user?.id) {
+            result = result.filter(item => item.sellerId !== user.id);
+          }
         } catch (error) {
           console.error("Error filtrando por categoría:", error);
           setFilteredItems([]);
           return;
         }
       } else {
-        result = [...allItems];
+        result = [...allItems]; // allItems ya viene filtrado (activos + no propios)
       }
 
       if (searchTerm.trim() !== "") {
@@ -102,9 +118,8 @@ const HomePage = () => {
     };
 
     applyFilters();
-  }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, allItems]);
+  }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, allItems, user?.id]);
 
-  // FUNCIÓN PARA LIMPIAR FILTROS
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedType("");
@@ -119,7 +134,6 @@ const HomePage = () => {
 
   return (
     <div className={styles.pageWrapper}>
-
       {/* HERO */}
       <section className={styles.hero}>
         <div className={styles.container}>
@@ -134,7 +148,6 @@ const HomePage = () => {
 
       {/* CONTENIDO */}
       <div className={styles.container}>
-
         {/* FILTROS */}
         <div className={styles.filtersCard}>
           <div className={styles.filtersGrid}>
@@ -185,13 +198,12 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* BOTÓN PARA LIMPIAR FILTROS */}
           <div className={styles.filtersActions}>
             <p className={styles.resultsCount}>
               {filteredItems.length} artículo(s) encontrado(s)
             </p>
-            <button 
-              onClick={clearFilters} 
+            <button
+              onClick={clearFilters}
               className={styles.clearFiltersBtn}
             >
               Limpiar filtros
@@ -212,7 +224,6 @@ const HomePage = () => {
             <p>No hay artículos que coincidan con los filtros.</p>
           </div>
         )}
-
       </div>
     </div>
   );

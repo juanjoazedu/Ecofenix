@@ -1,29 +1,30 @@
 // src/services/categoryService.js
 import { API_CONFIG } from "./api/config";
+import { getToken } from "./auth/tokenHelper"; // ← AÑADE ESTA LÍNEA
 
-// Categorías por defecto en caso de que el backend no responda
+// Categorías por defecto (ajústalas si quieres que coincidan con tu backend)
 const DEFAULT_CATEGORIES = [
-  { id: 1, name: "Electrónica" },
+  { id: 1, name: "Tecnología" },
   { id: 2, name: "Hogar" },
-  { id: 3, name: "Ropa" },
-  { id: 4, name: "Libros" },
-  { id: 5, name: "Deportes" },
-  { id: 6, name: "Juguetes" },
-  { id: 7, name: "Otros" },
+  { id: 3, name: "Moda" },
 ];
 
 const categoryService = {
   baseUrl: API_CONFIG.BASE_URL,
-  defaultHeaders: API_CONFIG.HEADERS,
+
+  // Headers que incluyen token si existe
+  authHeaders: () => ({
+    ...API_CONFIG.HEADERS,
+    ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+  }),
 
   async _request(endpoint) {
     const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, { headers: this.defaultHeaders });
+    const response = await fetch(url, { headers: this.authHeaders() });
     if (!response.ok) throw new Error("Error en la petición a categorías");
     return response.json();
   },
 
-  // Obtener categorías principales (con fallback a DEFAULT_CATEGORIES)
   async getMainCategories() {
     try {
       const categories = await this._request(API_CONFIG.ENDPOINTS.CATEGORIES.MAIN);
@@ -44,7 +45,7 @@ const categoryService = {
       return await this._request(API_CONFIG.ENDPOINTS.CATEGORIES.SUB(parentId));
     } catch (error) {
       console.error(`Error obteniendo subcategorías para parentId ${parentId}`, error);
-      return []; // Devuelve array vacío en caso de error
+      return [];
     }
   },
 };

@@ -10,6 +10,17 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // { id, username, email, roles, ... }
   const [loading, setLoading] = useState(true);
 
+  const refreshUser = async () => {
+    if (!user?.id) return;
+    try {
+      const userData = await userService.getUserById(user.id);
+      const merged = { ...userData, token: user.token, roles: userData.roles?.map(r => r.title) || [] };
+      setUser(merged);
+      localStorage.setItem("auth_user", JSON.stringify(merged));
+    } catch (error) {
+      console.error("Error al refrescar usuario:", error);
+    }
+  };
   // Al montar, si hay token guardado, podemos intentar cargar los datos del usuario
   // (opcionalmente podemos decodificar el token o hacer una petición GET /users/{id})
   // Por ahora solo guardaremos los datos al loguearse/registrarse.
@@ -64,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

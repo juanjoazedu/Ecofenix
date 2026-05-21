@@ -20,12 +20,12 @@ const LoginPage = () => {
     password: "",
   });
 
-  // Register (archivos locales, no se suben hasta el submit)
+  // Register 
   const [registerData, setRegisterData] = useState({
     nombre: "",
     apellido: "",
     fechaNacimiento: "",
-    imagenFile: null,        // 👈 archivo, no URL
+    imagenFile: null,       
     email: "",
     username: "",
     password: "",

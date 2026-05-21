@@ -1,16 +1,48 @@
 // src/components/Layout/Navbar.jsx
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { cartService } from "../../services/cartService";
 import logo from "../../assets/images/logo-ecofenix.jpeg";
 import styles from "../../styles/Navbar.module.css";
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    // Solo si hay sesión y tenemos el id del usuario
+    if (!isAuthenticated || !user?.id) {
+      setCartCount(0);
+      return;
+    }
+
+    const fetchCartCount = async () => {
+      try {
+        const cart = await cartService.getCart(user.id);
+        const count = Array.isArray(cart.cartItems) ? cart.cartItems.length : 0;
+        setCartCount(count);
+      } catch (error) {
+        console.error("Error al obtener carrito:", error);
+        setCartCount(0);
+      }
+    };
+
+    fetchCartCount();
+
+    // Actualiza el contador al volver a la pestaña
+    const onFocus = () => fetchCartCount();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [isAuthenticated, user?.id]);
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    const confirmar = window.confirm("¿Estás seguro de que deseas cerrar sesión?");
+    if (confirmar) {
+      logout();
+      navigate("/");
+    }
   };
 
   return (
@@ -24,8 +56,13 @@ const Navbar = () => {
           <Link to="/catalogo" className={styles.navLink}>Catálogo</Link>
           <Link to="/publicar" className={styles.navLink}>Publicar</Link>
           <Link to="/nosotros" className={styles.navLink}>Nosotros</Link>
-          <Link to="/carrito" className={styles.navLink}>🛒 Carrito</Link>
-          
+          <Link to="/carrito" className={styles.navLink}>
+            🛒
+            {cartCount > 0 && (
+              <span className={styles.cartBadge}>{cartCount}</span>
+            )}
+          </Link>
+
           {isAuthenticated ? (
             <>
               <span className={styles.userGreeting}>Hola, {user.username}</span>
@@ -42,4 +79,5 @@ const Navbar = () => {
     </header>
   );
 };
+
 export default Navbar;

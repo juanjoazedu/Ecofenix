@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import styles from "../../styles/ItemCard.module.css";
 
-const ItemCard = ({ item }) => {
-  const firstImage = item.images && item.images.length > 0 ? item.images[0].url : "https://picsum.photos/300/200";
+const ItemCard = ({ item, showRequestButton = true }) => {
+  const firstImage =
+    item.images && item.images.length > 0
+      ? item.images[0].url
+      : "https://picsum.photos/300/200";
 
-  return (
-    <Link to={`/item/${item.id}`} className={styles.card}>
+  const cardContent = (
+    <>
       <div className={styles.imageWrapper}>
         <img src={firstImage} alt={item.title} className={styles.image} />
       </div>
@@ -13,7 +16,9 @@ const ItemCard = ({ item }) => {
         <div className={styles.header}>
           <h3 className={styles.title}>{item.title}</h3>
           {item.type === "FOR_SALE" ? (
-            <span className={styles.priceBadge}>${item.price.toLocaleString()}</span>
+            <span className={styles.priceBadge}>
+              ${item.price.toLocaleString()}
+            </span>
           ) : (
             <span className={styles.donationBadge}>Donación</span>
           )}
@@ -23,18 +28,26 @@ const ItemCard = ({ item }) => {
           <span className={styles.status}>
             <span className={styles.dot}></span> Disponible
           </span>
-          <button
-            className={styles.btnOutline}
-            onClick={(e) => {
-              e.preventDefault();
-              console.log("Solicitar artículo:", item);
-            }}
-          >
-            Solicitar
-          </button>
+          {showRequestButton && (
+            // Solo un span con estilo, NO un Link, para evitar <a> anidado
+            <span className={styles.btnOutline}>
+              Solicitar
+            </span>
+          )}
         </div>
       </div>
-    </Link>
+    </>
   );
+
+  if (showRequestButton) {
+    return (
+      <Link to={`/items/${item.id}`} className={styles.card}>
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return <div className={styles.card}>{cardContent}</div>;
 };
+
 export default ItemCard;

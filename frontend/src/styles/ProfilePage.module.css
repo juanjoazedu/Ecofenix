@@ -221,6 +221,41 @@
   background: var(--bg-subtle);
 }
 
+.becomeSellerBtn,
+.addAddressBtn {
+  background: linear-gradient(135deg, var(--green-600), var(--green-700));
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 8px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+  display: inline-block;
+}
+
+.becomeSellerBtn:hover,
+.addAddressBtn:hover {
+  background: linear-gradient(135deg, var(--green-700), var(--green-800));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.removeAddressBtn {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
 /* Artículos */
 .itemsGrid {
   display: grid;
@@ -259,9 +294,19 @@
 }
 
 .deleteBtn {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: white;
   color: #c53030;
-  border-color: #fed7d7;
+  border: 1px solid #fed7d7;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  grid-column: 1 / -1;
+  width: fit-content;
 }
+
 .deleteBtn:hover {
   background: #fff5f5;
   border-color: #c53030;

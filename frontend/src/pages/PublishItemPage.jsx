@@ -1,6 +1,7 @@
 // src/pages/PublishItemPage.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
 import { uploadFiles } from "../services/cloudinaryService";
@@ -8,6 +9,18 @@ import styles from "../styles/PublishItemPage.module.css";
 
 const PublishItemPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Redirigir si no está autenticado o no tiene rol de vendedor
+  useEffect(() => {
+    if (!user) {
+      navigate("/ingresar");
+    } else if (!user.roles.includes("SELLER")) {
+      alert("Necesitas activar el rol de vendedor en tu perfil para publicar.");
+      navigate("/perfil");
+    }
+  }, [user, navigate]);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -18,7 +31,7 @@ const PublishItemPage = () => {
     type: "FOR_SALE",
     status: "ACTIVE",
     categoryIds: [],
-    sellerId: Number(import.meta.env.VITE_DEFAULT_SELLER_ID) || 1
+    sellerId: user?.id || null,
   });
   const [mainCategories, setMainCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
