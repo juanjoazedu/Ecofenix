@@ -1,5 +1,6 @@
 // src/pages/CartPage.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import styles from "../styles/CartPage.module.css";
 
@@ -13,18 +14,20 @@ export default function CartPage() {
     emptyCart,
   } = useCart();
 
+  const navigate = useNavigate();
+
   const [actionLoading, setActionLoading] = useState(null); // id del ítem en proceso
 
-  const handleQuantityChange = async (itemId, newQuantity, oldQuantity) => {
+  const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
     setActionLoading(itemId);
     const success = await updateItemQuantity(itemId, newQuantity);
     setActionLoading(null);
     if (!success) {
       alert("No se pudo actualizar la cantidad. Verifica el stock disponible.");
-      return; // No disparar evento si falló
+      return;
     }
-    window.dispatchEvent(new CustomEvent('cart-updated')); // Avisa al Navbar
+    window.dispatchEvent(new CustomEvent("cart-updated"));
   };
 
   const handleRemove = async (itemId) => {
@@ -106,7 +109,7 @@ export default function CartPage() {
 
         <button
           className={styles.checkoutBtn}
-          onClick={() => alert("Funcionalidad de pago en desarrollo")}
+          onClick={() => navigate("/pago")}
           className={styles.emptyBtn}
         >
           Efectuar compra

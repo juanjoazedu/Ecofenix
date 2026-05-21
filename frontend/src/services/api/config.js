@@ -44,5 +44,16 @@ export const API_CONFIG = {
       REMOVE_ITEM: (customerId, itemId) => `/carts/${customerId}/items/${itemId}`,
       EMPTY: (customerId) => `/carts/${customerId}/empty`,
     },
+    ORDERS: {
+      CREATE: "/orders",
+      GET_BY_ID: (id) => `/orders/${id}`,
+      CONFIRM_FREE: (id) => `/orders/${id}/confirm-free`,
+      // El frontend no necesita UPDATE_STATUS porque lo hace el backend automáticamente
+    },
+    PAYMENTS: {
+      CREATE: "/payments",
+      GET_BY_ID: (id) => `/payments/${id}`,
+      GET_INVOICE: (id) => `/payments/${id}/invoice`,
+    },
   },
 };

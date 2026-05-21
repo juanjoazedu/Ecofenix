@@ -1,0 +1,324 @@
+/* src/styles/InvoicePage.module.css */
+
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Status / loading / error */
+.status {
+  max-width: 820px;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.error {
+  color: #b94a4a;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.8rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+.invoiceNumber {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--green-900);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.issueDate {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--green-200);
+  color: var(--green-800);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+/* Card principal */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+/* Info grid (cliente / envío / pago) */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding-bottom: 1.8rem;
+  margin-bottom: 1.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.infoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.infoTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+.infoLine {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.infoLineMuted {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+/* Section title */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--green-900);
+  margin-bottom: 1.2rem;
+}
+
+/* Items table */
+.itemsTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.8rem;
+}
+
+.itemsHeader {
+  display: grid;
+  grid-template-columns: 2.5fr 0.7fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 2.5fr 0.7fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.9rem 0.8rem;
+  align-items: center;
+  border-bottom: 1px solid var(--bg-subtle);
+  font-size: 0.95rem;
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+.itemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.itemTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.itemShipping {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.itemTotal {
+  font-weight: 600;
+  color: var(--green-700);
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.emptyItems {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+/* Summary box (reutiliza estética del checkout) */
+.summaryBox {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 0.8rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.totalAmount {
+  color: var(--green-800);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  padding: 0.85rem 1.8rem;
+  background: var(--green-600);
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.primaryBtn:hover {
+  background: var(--green-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.secondaryBtn {
+  padding: 0.85rem 1.8rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.secondaryBtn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-hover);
+  color: var(--green-700);
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+  .invoiceNumber {
+    font-size: 1.6rem;
+  }
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .itemsHeader {
+    display: none;
+  }
+  .itemRow {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1rem 0.6rem;
+  }
+  .alignCenter,
+  .alignRight {
+    text-align: left;
+  }
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions button {
+    width: 100%;
+  }
+}
+
+/* Print: para que se vea limpio al imprimir */
+@media print {
+  .pageWrapper {
+    background: white;
+  }
+  .actions,
+  .badge {
+    display: none;
+  }
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}

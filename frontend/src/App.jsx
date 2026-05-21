@@ -15,6 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import EditItemPage from "./pages/EditItemPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import InvoicePage from "./pages/InvoicePage";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
-              
+
               {/* Públicas */}
               <Route index element={<HomePage />} />
               <Route path="/catalogo" element={<HomePage />} />
@@ -73,6 +74,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <CheckoutPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/factura/:paymentId"
+                element={
+                  <ProtectedRoute>
+                    <InvoicePage />
                   </ProtectedRoute>
                 }
               />

@@ -38,6 +38,7 @@ export function CartProvider({ children }) {
     try {
       await cartService.addItem(customerId, itemId, quantity);
       await fetchCart();
+      window.dispatchEvent(new CustomEvent("cart-updated"));
       return true;
     } catch (err) {
       setError(err.message);
@@ -50,6 +51,7 @@ export function CartProvider({ children }) {
     try {
       await cartService.updateItemQuantity(customerId, itemId, quantity);
       await fetchCart();
+      window.dispatchEvent(new CustomEvent("cart-updated"));
       return true;
     } catch (err) {
       return false;
@@ -62,6 +64,7 @@ export function CartProvider({ children }) {
     try {
       await cartService.removeItem(customerId, itemId);
       await fetchCart();
+      window.dispatchEvent(new CustomEvent("cart-updated"));
       return true;
     } catch (err) {
       setError(err.message);
@@ -75,6 +78,7 @@ export function CartProvider({ children }) {
     try {
       await cartService.emptyCart(customerId);
       setCart(null);
+      window.dispatchEvent(new CustomEvent("cart-updated"));
       return true;
     } catch (err) {
       setError(err.message);
