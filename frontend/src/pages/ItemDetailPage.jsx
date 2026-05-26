@@ -2,11 +2,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { itemService } from "../services/itemService";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import styles from "../styles/ItemDetailPage.module.css";
 
 const ItemDetailPage = () => {
   const { id } = useParams();
   const { addItem, cart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [item, setItem] = useState(null);
@@ -54,6 +56,11 @@ const ItemDetailPage = () => {
   };
 
   const handleAddToCart = async () => {
+    if (!user) {
+      alert("Por favor inicia sesión para agregar artículos al carrito.");
+      navigate("/ingresar");
+      return;
+    }
     setIsAddingToCart(true);
     const success = await addItem(item.id, quantity);
     setIsAddingToCart(false);
@@ -65,6 +72,11 @@ const ItemDetailPage = () => {
   };
 
   const handleBuyNow = async () => {
+    if (!user) {
+      alert("Por favor inicia sesión para continuar con la compra.");
+      navigate("/ingresar");
+      return;
+    }
     setIsBuyingNow(true);
     const success = await addItem(item.id, quantity);
     setIsBuyingNow(false);

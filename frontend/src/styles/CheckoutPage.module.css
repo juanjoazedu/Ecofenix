@@ -258,6 +258,17 @@
   box-shadow: 0 0 0 3px rgba(106, 191, 135, 0.15);
 }
 
+.inputError {
+  border-color: #e05252 !important;
+  box-shadow: 0 0 0 3px rgba(224, 82, 82, 0.12) !important;
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: #c0392b;
+  margin-top: 2px;
+}
+
 /* Success */
 .successContent {
   text-align: center;
@@ -395,6 +406,168 @@
 .linkBtn:hover {
   color: var(--green-800);
   text-decoration: underline;
+}
+
+/* ===== TARJETA VISUAL ===== */
+.cardScene {
+  perspective: 1000px;
+  margin-bottom: 2rem;
+  height: 190px;
+}
+
+.cardVisual {
+  width: 100%;
+  height: 190px;
+  border-radius: 16px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.18);
+}
+
+.cardVisualFlipped {
+  transform: rotateY(180deg);
+}
+
+.cardDebit {
+  background: linear-gradient(135deg, #1b4332 0%, #40916c 60%, #52b788 100%);
+}
+
+.cardCredit {
+  background: linear-gradient(135deg, #1a2a4a 0%, #2d6a8f 60%, #4895bf 100%);
+}
+
+.cardFront,
+.cardBack {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1.4rem 1.6rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  color: white;
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cardVisualTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.cardChip {
+  width: 42px;
+  height: 32px;
+  background: rgba(255, 220, 100, 0.85);
+  border-radius: 6px;
+  display: block;
+}
+
+.cardBrand {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.cardNum {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-align: center;
+  font-family: "Courier New", monospace;
+  margin-bottom: 1.2rem;
+}
+
+.cardVisualBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.cardLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  opacity: 0.7;
+  margin-bottom: 3px;
+}
+
+.cardValue {
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardStripe {
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  margin: 0 -1.6rem;
+}
+
+.cardCvvRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding-right: 0.5rem;
+}
+
+.cardCvvBox {
+  background: white;
+  color: #222;
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 4px;
+  letter-spacing: 4px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Selector débito / crédito */
+.cardTypeSelector {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.cardTypeBtn {
+  flex: 1;
+  padding: 0.65rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.cardTypeBtn:hover {
+  border-color: var(--border-hover);
+}
+
+.cardTypeBtnActive {
+  border-color: var(--green-500);
+  background: rgba(74, 158, 104, 0.08);
+  color: var(--green-800);
+  font-weight: 600;
 }
 
 /* Responsive */

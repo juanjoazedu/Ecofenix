@@ -1,5 +1,5 @@
 // src/pages/HomePage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { itemService } from "../services/itemService";
 import { categoryService } from "../services/categoryService";
 import { useAuth } from "../context/AuthContext"; // ← nuevo
@@ -7,7 +7,7 @@ import ItemCard from "../components/Items/ItemCard";
 import styles from "../styles/HomePage.module.css";
 
 const HomePage = () => {
-  const { user } = useAuth(); // ← obtener usuario logueado
+  const { user } = useAuth();
 
   const [allItems, setAllItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -18,6 +18,12 @@ const HomePage = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [isTypeOpen, setIsTypeOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
+  const typeRef = useRef(null);
+  const categoryRef = useRef(null);
+  const subCategoryRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +87,7 @@ const HomePage = () => {
       const categoryIdsToFilter = selectedSubCategory
         ? [Number(selectedSubCategory)]
         : selectedCategory
-          ? [Number(selectedCategory)]
+          ? [Number(selectedCategory), ...subCategories.map((s) => Number(s.id))]
           : [];
 
       if (categoryIdsToFilter.length > 0) {
@@ -98,7 +104,7 @@ const HomePage = () => {
           return;
         }
       } else {
-        result = [...allItems]; // allItems ya viene filtrado (activos + no propios)
+        result = [...allItems];
       }
 
       if (searchTerm.trim() !== "") {
@@ -118,7 +124,20 @@ const HomePage = () => {
     };
 
     applyFilters();
-  }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, allItems, user?.id]);
+  }, [searchTerm, selectedType, selectedCategory, selectedSubCategory, subCategories, allItems, user?.id]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (typeRef.current && !typeRef.current.contains(e.target))
+        setIsTypeOpen(false);
+      if (categoryRef.current && !categoryRef.current.contains(e.target))
+        setIsCategoryOpen(false);
+      if (subCategoryRef.current && !subCategoryRef.current.contains(e.target))
+        setIsSubCategoryOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -126,6 +145,9 @@ const HomePage = () => {
     setSelectedCategory("");
     setSelectedSubCategory("");
     setSubCategories([]);
+    setIsTypeOpen(false);
+    setIsCategoryOpen(false);
+    setIsSubCategoryOpen(false);
   };
 
   if (loading) {
@@ -150,7 +172,7 @@ const HomePage = () => {
       <div className={styles.container}>
         {/* FILTROS */}
         <div className={styles.filtersCard}>
-          <div className={styles.filtersGrid}>
+          <div className={`${styles.filtersGrid} ${subCategories.length > 0 ? styles.filtersGridFour : ""}`}>
             <input
               type="text"
               placeholder="Buscar por nombre o descripción..."
@@ -159,42 +181,119 @@ const HomePage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <select
-              className={styles.select}
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              <option value="">Todos los tipos</option>
-              <option value="FOR_SALE">Venta solidaria</option>
-              <option value="DONATION">Donación gratuita</option>
-            </select>
-
-            <select
-              className={styles.select}
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              <option value="">Todas las categorías</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-
-            {subCategories.length > 0 && (
-              <select
-                className={styles.select}
-                value={selectedSubCategory}
-                onChange={(e) => setSelectedSubCategory(e.target.value)}
+            {/* Dropdown custom de Tipo */}
+            <div className={styles.customSelect} ref={typeRef}>
+              <button
+                className={`${styles.customSelectTrigger} ${isTypeOpen ? styles.customSelectTriggerOpen : ""}`}
+                onClick={() => setIsTypeOpen((o) => !o)}
+                type="button"
               >
-                <option value="">Todas las subcategorías</option>
-                {subCategories.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
-                  </option>
-                ))}
-              </select>
+                <span className={styles.customSelectValue}>
+                  {selectedType === "FOR_SALE" ? "Venta solidaria" : selectedType === "DONATION" ? "Donación gratuita" : "Todos los tipos"}
+                </span>
+                <span className={`${styles.chevron} ${isTypeOpen ? styles.chevronOpen : ""}`}>▾</span>
+              </button>
+              {isTypeOpen && (
+                <div className={styles.customSelectDropdown}>
+                  <button
+                    className={`${styles.dropdownItem} ${selectedType === "" ? styles.dropdownItemSelected : ""}`}
+                    onClick={() => { setSelectedType(""); setIsTypeOpen(false); }}
+                    type="button"
+                  >
+                    Todos los tipos
+                  </button>
+                  <button
+                    className={`${styles.dropdownItem} ${selectedType === "FOR_SALE" ? styles.dropdownItemSelected : ""}`}
+                    onClick={() => { setSelectedType("FOR_SALE"); setIsTypeOpen(false); }}
+                    type="button"
+                  >
+                    Venta solidaria
+                  </button>
+                  <button
+                    className={`${styles.dropdownItem} ${selectedType === "DONATION" ? styles.dropdownItemSelected : ""}`}
+                    onClick={() => { setSelectedType("DONATION"); setIsTypeOpen(false); }}
+                    type="button"
+                  >
+                    Donación gratuita
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Dropdown custom de Categoría */}
+            <div className={styles.customSelect} ref={categoryRef}>
+              <button
+                className={`${styles.customSelectTrigger} ${isCategoryOpen ? styles.customSelectTriggerOpen : ""}`}
+                onClick={() => setIsCategoryOpen((o) => !o)}
+                type="button"
+              >
+                <span className={styles.customSelectValue}>
+                  {selectedCategory
+                    ? categories.find((c) => String(c.id) === selectedCategory)?.name
+                    : "Todas las categorías"}
+                </span>
+                <span className={`${styles.chevron} ${isCategoryOpen ? styles.chevronOpen : ""}`}>▾</span>
+              </button>
+              {isCategoryOpen && (
+                <div className={styles.customSelectDropdown}>
+                  <button
+                    className={`${styles.dropdownItem} ${selectedCategory === "" ? styles.dropdownItemSelected : ""}`}
+                    onClick={() => { setSelectedCategory(""); setIsCategoryOpen(false); }}
+                    type="button"
+                  >
+                    Todas las categorías
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`${styles.dropdownItem} ${selectedCategory === String(cat.id) ? styles.dropdownItemSelected : ""}`}
+                      onClick={() => { setSelectedCategory(String(cat.id)); setIsCategoryOpen(false); }}
+                      type="button"
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dropdown custom de Subcategoría */}
+            {subCategories.length > 0 && (
+              <div className={styles.customSelect} ref={subCategoryRef}>
+                <button
+                  className={`${styles.customSelectTrigger} ${isSubCategoryOpen ? styles.customSelectTriggerOpen : ""}`}
+                  onClick={() => setIsSubCategoryOpen((o) => !o)}
+                  type="button"
+                >
+                  <span className={styles.customSelectValue}>
+                    {selectedSubCategory
+                      ? subCategories.find((s) => String(s.id) === selectedSubCategory)?.name
+                      : "Todas las subcategorías"}
+                  </span>
+                  <span className={`${styles.chevron} ${isSubCategoryOpen ? styles.chevronOpen : ""}`}>▾</span>
+                </button>
+                {isSubCategoryOpen && (
+                  <div className={styles.customSelectDropdown}>
+                    <button
+                      className={`${styles.dropdownItem} ${selectedSubCategory === "" ? styles.dropdownItemSelected : ""}`}
+                      onClick={() => { setSelectedSubCategory(""); setIsSubCategoryOpen(false); }}
+                      type="button"
+                    >
+                      Todas las subcategorías
+                    </button>
+                    {subCategories.map((sub) => (
+                      <button
+                        key={sub.id}
+                        className={`${styles.dropdownItem} ${selectedSubCategory === String(sub.id) ? styles.dropdownItemSelected : ""}`}
+                        onClick={() => { setSelectedSubCategory(String(sub.id)); setIsSubCategoryOpen(false); }}
+                        type="button"
+                      >
+                        {sub.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

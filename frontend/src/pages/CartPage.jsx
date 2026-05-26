@@ -18,8 +18,12 @@ export default function CartPage() {
 
   const [actionLoading, setActionLoading] = useState(null); // id del ítem en proceso
 
-  const handleQuantityChange = async (itemId, newQuantity) => {
+  const handleQuantityChange = async (itemId, newQuantity, stock) => {
     if (newQuantity < 1) return;
+    if (stock != null && newQuantity > stock) {
+      alert("Has alcanzado el stock máximo disponible para este artículo.");
+      return;
+    }
     setActionLoading(itemId);
     const success = await updateItemQuantity(itemId, newQuantity);
     setActionLoading(null);
@@ -68,7 +72,7 @@ export default function CartPage() {
             </div>
             <div className={styles.controls}>
               <button
-                onClick={() => handleQuantityChange(item.itemId, item.quantity - 1)}
+                onClick={() => handleQuantityChange(item.itemId, item.quantity - 1, item.stock)}
                 disabled={item.quantity <= 1 || actionLoading === item.itemId}
                 className={styles.qtyBtn}
               >
@@ -76,8 +80,8 @@ export default function CartPage() {
               </button>
               <span className={styles.qty}>{item.quantity}</span>
               <button
-                onClick={() => handleQuantityChange(item.itemId, item.quantity + 1)}
-                disabled={actionLoading === item.itemId}
+                onClick={() => handleQuantityChange(item.itemId, item.quantity + 1, item.stock)}
+                disabled={actionLoading === item.itemId || (item.stock != null && item.quantity >= item.stock)}
                 className={styles.qtyBtn}
               >
                 +

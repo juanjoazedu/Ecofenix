@@ -10,12 +10,16 @@ import styles from "../styles/PublishItemPage.module.css";
 const PublishItemPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const hasRedirected = useRef(false);
 
-  // Redirigir si no está autenticado o no tiene rol de vendedor
+  // Redirigir si no está autenticado o no tiene rol de vendedor (guarda para evitar doble ejecución en StrictMode)
   useEffect(() => {
+    if (hasRedirected.current) return;
     if (!user) {
+      hasRedirected.current = true;
       navigate("/ingresar");
     } else if (!user.roles.includes("SELLER")) {
+      hasRedirected.current = true;
       alert("Necesitas activar el rol de vendedor en tu perfil para publicar.");
       navigate("/perfil");
     }
@@ -37,6 +41,10 @@ const PublishItemPage = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [selectedMainCat, setSelectedMainCat] = useState("");
   const [selectedSubCat, setSelectedSubCat] = useState("");
+  const [isMainCatOpen, setIsMainCatOpen] = useState(false);
+  const [isSubCatOpen, setIsSubCatOpen] = useState(false);
+  const mainCatRef = useRef(null);
+  const subCatRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -52,6 +60,18 @@ const PublishItemPage = () => {
   // Cargar categorías principales
   useEffect(() => {
     categoryService.getMainCategories().then(setMainCategories);
+  }, []);
+
+  // Cerrar dropdowns al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mainCatRef.current && !mainCatRef.current.contains(e.target))
+        setIsMainCatOpen(false);
+      if (subCatRef.current && !subCatRef.current.contains(e.target))
+        setIsSubCatOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Subcategorías al cambiar categoría principal
@@ -191,32 +211,97 @@ const PublishItemPage = () => {
           </div>
         )}
 
+        {/* Stock */}
+        <div className={styles.field}>
+          <label className={styles.label}>Stock *</label>
+          <input type="number" name="stock" value={formData.stock} onChange={handleChange} className={styles.input} min="1" required />
+        </div>
+
+        {/* Costo de envío */}
+        <div className={styles.field}>
+          <label className={styles.label}>Costo de envío (COP)</label>
+          <input type="number" name="shippingCost" value={formData.shippingCost} onChange={handleChange} className={styles.input} min="0" step="1000" />
+        </div>
+
         {/* Categorías */}
         <div className={styles.field}>
           <label className={styles.label}>Categoría *</label>
-          <select
-            className={styles.select}
-            value={selectedMainCat}
-            onChange={(e) => handleMainCatChange(Number(e.target.value))}
-          >
-            <option value="">-- Selecciona categoría principal --</option>
-            {mainCategories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
-          </select>
+
+          {/* Categoría principal */}
+          <div className={styles.customSelect} ref={mainCatRef}>
+            <button
+              className={`${styles.customSelectTrigger} ${isMainCatOpen ? styles.customSelectTriggerOpen : ""}`}
+              onClick={() => setIsMainCatOpen((o) => !o)}
+              type="button"
+            >
+              <span className={styles.customSelectValue}>
+                {selectedMainCat
+                  ? mainCategories.find((c) => c.id === selectedMainCat)?.name
+                  : "-- Selecciona categoría principal --"}
+              </span>
+              <span className={`${styles.chevron} ${isMainCatOpen ? styles.chevronOpen : ""}`}>▾</span>
+            </button>
+            {isMainCatOpen && (
+              <div className={styles.customSelectDropdown}>
+                <button
+                  className={`${styles.dropdownItem} ${!selectedMainCat ? styles.dropdownItemSelected : ""}`}
+                  onClick={() => { handleMainCatChange(""); setIsMainCatOpen(false); }}
+                  type="button"
+                >
+                  -- Selecciona categoría principal --
+                </button>
+                {mainCategories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    className={`${styles.dropdownItem} ${selectedMainCat === cat.id ? styles.dropdownItemSelected : ""}`}
+                    onClick={() => { handleMainCatChange(cat.id); setIsMainCatOpen(false); setIsSubCatOpen(false); }}
+                    type="button"
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Subcategoría */}
           {subCategories.length > 0 && (
             <>
-              <select
-                className={styles.select}
-                value={selectedSubCat}
-                onChange={(e) => handleSubCatChange(Number(e.target.value))}
-                style={{ marginTop: "8px" }}
-              >
-                <option value="">-- Elige una subcategoría (obligatoria) --</option>
-                {subCategories.map((sub) => (
-                  <option key={sub.id} value={sub.id}>{sub.name}</option>
-                ))}
-              </select>
+              <div className={styles.customSelect} ref={subCatRef} style={{ marginTop: "8px" }}>
+                <button
+                  className={`${styles.customSelectTrigger} ${isSubCatOpen ? styles.customSelectTriggerOpen : ""}`}
+                  onClick={() => setIsSubCatOpen((o) => !o)}
+                  type="button"
+                >
+                  <span className={styles.customSelectValue}>
+                    {selectedSubCat
+                      ? subCategories.find((s) => s.id === selectedSubCat)?.name
+                      : "-- Elige una subcategoría (obligatoria) --"}
+                  </span>
+                  <span className={`${styles.chevron} ${isSubCatOpen ? styles.chevronOpen : ""}`}>▾</span>
+                </button>
+                {isSubCatOpen && (
+                  <div className={styles.customSelectDropdown}>
+                    <button
+                      className={`${styles.dropdownItem} ${!selectedSubCat ? styles.dropdownItemSelected : ""}`}
+                      onClick={() => { handleSubCatChange(""); setIsSubCatOpen(false); }}
+                      type="button"
+                    >
+                      -- Elige una subcategoría (obligatoria) --
+                    </button>
+                    {subCategories.map((sub) => (
+                      <button
+                        key={sub.id}
+                        className={`${styles.dropdownItem} ${selectedSubCat === sub.id ? styles.dropdownItemSelected : ""}`}
+                        onClick={() => { handleSubCatChange(sub.id); setIsSubCatOpen(false); }}
+                        type="button"
+                      >
+                        {sub.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <p className={styles.hint}>* Esta categoría tiene subcategorías, debes elegir una.</p>
             </>
           )}
